@@ -1,6 +1,6 @@
 # AI-Based Resume Scanner
 
-A AI-powered Resume Scanner that extracts key details such as **Name, Email, Phone, and Skills** from resumes (PDF/DOCX) built with **PYTHON**, **NLP (spaCy)** and **PDF parsing (pdfplumber)**.
+An AI-powered Resume Scanner that extracts key details such as **Name, Email, Phone, and Skills** from resumes (PDF/DOCX) built with **PYTHON**, **NLP (spaCy)** and **PDF parsing (pdfplumber)**.
 
 ## Features
 
