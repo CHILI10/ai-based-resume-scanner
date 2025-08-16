@@ -36,10 +36,22 @@ def extract_details(text):
     phones = re.findall(phone_pattern, text)
     details["Phone"] = phones[0] if phones else "Not Found"
     
-    # Extract name using NLP
+    # Extract name using NLP 
     doc = nlp(text)
     names = [ent.text for ent in doc.ents if ent.label_ == "PERSON"]
-    details["Name"] = names[0] if names else "Not Found"
+
+    if names:
+        # Pick the longest name (usually full name, not "Gym")
+        best_name = max(names, key=len)
+
+        # Ignore names that look like project/website names
+        ignore_words = ["project", "website", "resume", "cv"]
+        if any(word.lower() in best_name.lower() for word in ignore_words):
+            details["Name"] = "Not Found"
+        else:
+            details["Name"] = best_name
+    else:
+        details["Name"] = "Not Found"
     
     # Extract skills (basic keyword matching)
     skills = ["Python", "Java", "Machine Learning", "Data Science", "AI", "Deep Learning", "NLP", "SQL", "Excel"]
@@ -64,7 +76,19 @@ def process_resume(file_path):
 
 # Main function
 if __name__ == "__main__":
-    resume_path = input("Enter the path of the resume (PDF/DOCX): ")
+    import os
+    import logging
+
+# Suppress pdfminer font warnings
+logging.getLogger("pdfminer").setLevel(logging.ERROR)
+resume_path = input("Enter resume path or filename: ")
+resume_path = resume_path if os.path.isabs(resume_path) else os.path.join(os.getcwd(), resume_path)
+
+if not os.path.exists(resume_path):
+    print("❌ File not found! Please provide a valid path or put the file in the same folder as this script.")
+else:
+    print("✅ Using resume file:", resume_path)
+    # 👉 Continue with your resume processing here
     if os.path.exists(resume_path):
         extracted_details = process_resume(resume_path)
         if extracted_details:
