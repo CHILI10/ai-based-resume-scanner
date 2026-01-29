@@ -4,6 +4,8 @@ import spacy
 import pdfplumber
 import docx
 import json
+import logging
+
 
 # Load spaCy NLP model for Named Entity Recognition (NER)
 nlp = spacy.load("en_core_web_sm")
@@ -38,20 +40,42 @@ def extract_details(text):
     
     # Extract name using NLP 
     doc = nlp(text)
-    names = [ent.text for ent in doc.ents if ent.label_ == "PERSON"]
+    ignore_words = [
+    "uttar pradesh", "delhi", "india""technology", "meerut", "university", "college",
+    "institute", "engineering", "bachelor", "master",
+    "project", "resume", "cv"
+    ]
+    valid_names = []
+    for ent in doc.ents:
 
-    if names:
-        # Pick the longest name (usually full name, not "Gym")
-        best_name = max(names, key=len)
-
-        # Ignore names that look like project/website names
-        ignore_words = ["project", "website", "resume", "cv"]
-        if any(word.lower() in best_name.lower() for word in ignore_words):
-            details["Name"] = "Not Found"
-        else:
-            details["Name"] = best_name
+        if ent.label_ == "PERSON":
+            name = ent.text.strip()
+            # must have at least first + last name
+            if len(name.split()) >= 2:
+                 if not any(word.lower() in name.lower() for word in ignore_words):
+                     valid_names.append(name)
+    if valid_names:
+        details["Name"] = valid_names[0]   # first valid full name
     else:
-        details["Name"] = "Not Found"
+         email = details.get("Email", "")
+
+         if email != "Not Found":
+             username = email.split("@")[0]
+             username = re.sub(r"\d+", "", username)
+             username = username.replace(".", " ").replace("_", " ").strip()
+             possible_name = username.title()
+             if len(possible_name.split()) >= 2:
+                  
+                  details["Name"] = possible_name
+             else: 
+                 details["Name"] = "Not Found"  
+         else:
+             details["Name"] = "Not Found"          
+
+             
+
+                        
+
     
     # Extract skills (basic keyword matching)
     skills = ["Python", "Java", "Machine Learning", "Data Science", "AI", "Deep Learning", "NLP", "SQL", "Excel"]
@@ -74,27 +98,27 @@ def process_resume(file_path):
     details = extract_details(text)
     return details
 
-# Main function
-if __name__ == "__main__":
-    import os
-    import logging
+## Main function
+#if __name__ == "__main__":
+#    import os
+#    import logging
 
-# Suppress pdfminer font warnings
-logging.getLogger("pdfminer").setLevel(logging.ERROR)
-resume_path = input("Enter resume path or filename: ")
-resume_path = resume_path if os.path.isabs(resume_path) else os.path.join(os.getcwd(), resume_path)
+## Suppress pdfminer font warnings
+#logging.getLogger("pdfminer").setLevel(logging.ERROR)
+#resume_path = input("Enter resume path or filename: ")
+#resume_path = resume_path if os.path.isabs(resume_path) else os.path.join(os.getcwd(), resume_path)
 
-if not os.path.exists(resume_path):
-    print("❌ File not found! Please provide a valid path or put the file in the same folder as this script.")
-else:
-    print("✅ Using resume file:", resume_path)
+#if not os.path.exists(resume_path):
+#    print("❌ File not found! Please provide a valid path or put the file in the same folder as this script.")
+#else:
+#    print("✅ Using resume file:", resume_path)
     # 👉 Continue with your resume processing here
-    if os.path.exists(resume_path):
-        extracted_details = process_resume(resume_path)
-        if extracted_details:
-            print(json.dumps(extracted_details, indent=4))
-            with open("extracted_resume_details.json", "w") as f:
-                json.dump(extracted_details, f, indent=4)
-            print("Resume details saved as extracted_resume_details.json")
-    else:
-        print("File not found! Please provide a valid path.")
+#    if os.path.exists(resume_path):
+#        extracted_details = process_resume(resume_path)
+#        if extracted_details:
+#            print(json.dumps(extracted_details, indent=4))
+#            with open("extracted_resume_details.json", "w") as f:
+#                json.dump(extracted_details, f, indent=4)
+#            print("Resume details saved as extracted_resume_details.json")
+#    else:
+#        print("File not found! Please provide a valid path.")
