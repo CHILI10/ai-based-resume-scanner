@@ -6,6 +6,10 @@ import docx
 import json
 import logging
 import streamlit as st
+from spacy.cli import download
+
+
+
 
 
 @st.cache_resource
