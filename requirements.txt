@@ -1,5 +1,6 @@
 streamlit
-spacy==3.7.2
+spacy==3.6.1
 pdfplumber
 python-docx
+en-core-web-sm==3.6.0
 

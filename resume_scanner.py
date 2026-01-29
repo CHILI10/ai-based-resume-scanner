@@ -5,19 +5,23 @@ import pdfplumber
 import docx
 import json
 import logging
+import streamlit as st
+
+
+@st.cache_resource
+def load_spacy_model():
+    try:
+        return spacy.load("en_core_web_sm")
+    except OSError:
+          download("en_core_web_sm")
+          return spacy.load("en_core_web_sm")
+nlp = load_spacy_model()    
+
 
 
 # Load spaCy NLP model for Named Entity Recognition (NER)
 
-def load_spacy_model():
-      try:
-          return spacy.load("en_core_web_sm")
-      except OSError:
-          
-          from spacy.cli import download
-          download("en_core_web_sm")
-          return spacy.load("en_core_web_sm")
-nlp = load_spacy_model()      
+     
 
 # Function to extract text from a PDF
 def extract_text_from_pdf(pdf_path):
