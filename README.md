@@ -21,10 +21,10 @@ pip install -r requirements.txt
 
 ## Usage
 
-Run the program:
+Run the program locally:
 
 ```bash
-python resume_scanner.py
+streamlit run app.py
 ```
 
 - Enter the file path or file name of the resume when prompted.
