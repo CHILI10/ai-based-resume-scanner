@@ -1,9 +1,10 @@
 
 import streamlit as st
 import tempfile
-import os
+
 from resume_scanner import process_resume
 import spacy
+import os
 
 try:
     nlp = spacy.load("en_core_web_sm")
