@@ -3,6 +3,13 @@ import streamlit as st
 import tempfile
 import os
 from resume_scanner import process_resume
+import spacy
+
+try:
+    nlp = spacy.load("en_core_web_sm")
+except:
+    os.system("python -m spacy download en_core_web_sm")
+    nlp = spacy.load("en_core_web_sm")
 
 st.set_page_config(
     page_title="AI Resume Scanner",
